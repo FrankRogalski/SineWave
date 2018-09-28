@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="SineWave:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/SineWave_jar</output-path>
+    <root id="archive" name="SineWave.jar">
+      <element id="module-output" name="SineWave" />
+    </root>
+  </artifact>
+</component>
