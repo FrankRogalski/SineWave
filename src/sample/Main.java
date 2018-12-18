@@ -11,19 +11,19 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.awt.geom.AffineTransform;
 import java.util.LinkedList;
 
 public class Main extends Application {
     private Canvas can;
     private GraphicsContext gc;
-    private double[] point = {110, 200};
     private final LinkedList<Point> line = new LinkedList<>();
     private Slider slider;
+    private static final int RADIUS = 50;
+    private double angle = 0;
 
     @Override
     public void init() {
-        final Timeline tlDraw = new Timeline(new KeyFrame(Duration.millis(16.67), e -> draw()));
+        final Timeline tlDraw = new Timeline(new KeyFrame(Duration.millis(1000d / 60), e -> draw()));
         tlDraw.setCycleCount(Timeline.INDEFINITE);
         tlDraw.play();
     }
@@ -40,11 +40,17 @@ public class Main extends Application {
 
         root.getChildren().add(can);
 
-        slider = new Slider(0, 0.5, 0.1);
+        slider = new Slider(0, 2 * Math.PI, 0.1);
+        slider.setMinWidth(700);
+        slider.setMaxWidth(700);
         root.getChildren().add(slider);
 
-        scene.widthProperty().addListener((obsv, oldVal, newVal) -> can.setWidth(newVal.doubleValue()));
-        scene.heightProperty().addListener((obsv, oldVal, newVal) -> can.setHeight(newVal.doubleValue()));
+        scene.widthProperty().addListener((observableValue, oldVal, newVal) -> {
+            can.setWidth(newVal.doubleValue());
+            slider.setMinWidth(newVal.doubleValue());
+            slider.setMaxWidth(newVal.doubleValue());
+        });
+        scene.heightProperty().addListener((observableValue, oldVal, newVal) -> can.setHeight(newVal.doubleValue()));
 
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -55,16 +61,17 @@ public class Main extends Application {
         gc.setLineWidth(1);
         gc.strokeOval(10, 150, 100, 100);
 
-        AffineTransform.getRotateInstance(slider.getValue(), 60, 200)
-                .transform(point, 0, point, 0, 1);
+        final double x = RADIUS * Math.sin(angle) + 55;
+        final double y = RADIUS * Math.cos(angle) + 200;
 
-        gc.fillOval(point[0] - 5, point[1] - 5, 10, 10);
-        line.addFirst(new Point(200, point[1]));
+        gc.fillOval(x, y - 5, 10, 10);
+        line.addFirst(new Point(200, y));
 
-        gc.fillOval(200, point[1] - 5, 10, 10);
-        gc.strokeLine(0, point[1], can.getWidth(), point[1]);
+        gc.fillOval(200, y - 5, 10, 10);
+        gc.strokeLine(0, y, can.getWidth(), y);
 
         drawPoints();
+        angle += slider.getValue();
     }
 
     private void drawPoints() {
